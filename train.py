@@ -175,7 +175,7 @@ def train_val(args):
             loss_re = regular(feat, emo_tensor.squeeze())
             loss = loss_ce + 0.001 * loss_re  #
             
-#             # (Trick) Todo: a new paper for this trick
+#             # (Trick) Todo: write a new paper for this trick
 #             geo_, vis_, y_vis, y_geo, hyper = trick(geo_tensor, vis_tensor, emo_tensor)
 #             geo_ = Variable(geo_.cuda(device=device), requires_grad=False)
 #             vis_ = Variable(vis_.cuda(device=device), requires_grad=False)
