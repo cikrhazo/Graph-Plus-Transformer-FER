@@ -6,8 +6,6 @@ from torch.cuda.amp import GradScaler
 from torch.cuda.amp import autocast
 
 from data_utilz.oulu import OuluSet
-from data_utilz.eNTERFace import eNTERFace
-from data_utilz.ck import CK
 from data_utilz.graphs import Graph
 
 import time
@@ -106,8 +104,6 @@ def train_val(args):
 
     # training
     TrainSet = OuluSet(valid=valid, train=True, out_size=img_size, window_size=window, online_ldm=False)
-    # TrainSet = CK(valid=valid, train=True, out_size=img_size, window_size=window, online_ldm=False)
-    # TrainSet = eNTERFace(train=True, out_size=img_size, window_size=window, online_ldm=False)
     TrainLoader = data.DataLoader(TrainSet, batch_size=batch_size, shuffle=True,
                                   pin_memory=False, num_workers=8, collate_fn=collate_fn)
 
