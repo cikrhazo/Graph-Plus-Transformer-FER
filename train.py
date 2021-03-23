@@ -201,16 +201,17 @@ def train_val(args):
             loss_ce = criterion(out, emo_tensor.squeeze())
             loss_re = regular(feat, emo_tensor.squeeze())
             loss = loss_ce + 0.001 * loss_re  #
+            
 #             # tricks !     
-#             geo_mixed, vis_mixed, y_a, y_b, lam = mixup_data(geo_tensor, vis_tensor, emo_tensor)
-#             geo_mixed = Variable(geo_mixed.cuda(device=device), requires_grad=False)
-#             vis_mixed = Variable(vis_mixed.cuda(device=device), requires_grad=False)
+#             geo_, vis_, y_a, y_b, lam = trick(geo_tensor, vis_tensor, emo_tensor)
+#             geo_ = Variable(geo_.cuda(device=device), requires_grad=False)
+#             vis_ = Variable(vis_.cuda(device=device), requires_grad=False)
 #             y_a = Variable(y_a.cuda(device=device), requires_grad=False)
 #             y_b = Variable(y_b.cuda(device=device), requires_grad=False)
 
 #             feat, out = net(vis_mixed, geo_mixed)
-#             loss_ce = mixup_criterion(criterion, out, y_a.squeeze(), y_b.squeeze(), lam)
-#             loss_re = mixup_criterion(regular, feat, y_a.squeeze(), y_b.squeeze(), lam)  # 
+#             loss_ce = tricks_criterion(criterion, out, y_a.squeeze(), y_b.squeeze(), lam)
+#             loss_re = tricks_criterion(regular, feat, y_a.squeeze(), y_b.squeeze(), lam)
 #             loss = loss_ce + 0.001 * loss_re
 
             loss.backward()
@@ -220,10 +221,6 @@ def train_val(args):
             scheduler.step()
             # sched_center.step()
 
-            label_t = emo_tensor.detach().squeeze().cuda(device=device)
-            _, label_p = torch.max(out, 1)
-            numCorrTrain += label_p.eq(label_t.data).cpu().sum()
-
             cls_loss += loss * geo_tensor.size(0)
             if batch_idx % 10 == 9 or batch_idx == 0:
                 print('#batch: %3d; loss_cls/cen: (%3.4f, %3.4f); learning rate: (%.4e, %.4e); Lam: %.4e'
@@ -231,9 +228,8 @@ def train_val(args):
                          optim_center.param_groups[0]['lr'], lam))
 
         avg_cls = cls_loss / trainSamples
-        trainAccuracy = (int(numCorrTrain) / trainSamples) * 100
-        logger.info('Train: Epoch = %3d | CLS Loss = %.4f | Train Samples = %3d | Train Accuracy = %.4f;'
-                    % (i + 1, avg_cls, trainSamples, trainAccuracy))
+        logger.info('Train: Epoch = %3d | CLS Loss = %.4f | Train Samples = %3d;'
+                    % (i + 1, avg_cls, trainSamples))
 
         if i % stride == (stride - 1):
             torch.save(net.module.state_dict(), os.path.join(model_path, 'net_epoch_' + str(i + 1).zfill(3) + '.pth'))
@@ -273,7 +269,7 @@ if __name__ == "__main__":
     parser.add_argument("--num_frame", type=int, default=16)
     parser.add_argument("--stride", type=int, default=50, help='the stride for saving models')
     parser.add_argument("--window", type=int, default=49, help="# local patch size")
-    parser.add_argument("--num_class", type=int, default=7, help="# of the classes")
+    parser.add_argument("--num_class", type=int, default=6, help="# of the classes")
 
     # For Training
     parser.add_argument("--load_checkpoint", type=str2bool, default=False)
