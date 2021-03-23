@@ -84,29 +84,6 @@ def collate_fn(batch):
     return torch.utils.data.dataloader.default_collate(batch)
 
 
-def background_erase(x1, x2):
-    '''
-    Returns be inputs
-    x1: b, 3, c, t, n
-    x2 b, n, c, h, w, t
-    '''
-
-    # alpha = random.uniform(0, 1)
-    # if alpha > 0.5:
-    #     return x1, x2
-
-    t = x1.size(3)
-    idx_select = random.randint(0, t - 1)
-    x1_select = x1[:, :, :, idx_select, :].squeeze()
-    x2_select = x2[:, :, :, :, :, idx_select].squeeze()
-    lam = random.uniform(0, 0.3)
-
-    mixed_x1 = (1 - lam) * x1 + lam * x1_select[:, :, :, None, :]
-    mixed_x2 = (1 - lam) * x2 + lam * x2_select[:, :, :, :, :, None]
-
-    return mixed_x1, mixed_x2
-
-
 def train_val(args):
 
     beginner = args.beginner
@@ -202,16 +179,16 @@ def train_val(args):
             loss_re = regular(feat, emo_tensor.squeeze())
             loss = loss_ce + 0.001 * loss_re  #
             
-#             # tricks !     
-#             geo_, vis_, y_a, y_b, lam = trick(geo_tensor, vis_tensor, emo_tensor)
+#             # (Trick) Todo: a new paper for this trick
+#             geo_, vis_, y_vis, y_geo, hyper = trick(geo_tensor, vis_tensor, emo_tensor)
 #             geo_ = Variable(geo_.cuda(device=device), requires_grad=False)
 #             vis_ = Variable(vis_.cuda(device=device), requires_grad=False)
-#             y_a = Variable(y_a.cuda(device=device), requires_grad=False)
-#             y_b = Variable(y_b.cuda(device=device), requires_grad=False)
+#             y_vis = Variable(y_vis.cuda(device=device), requires_grad=False)
+#             y_geo = Variable(y_geo.cuda(device=device), requires_grad=False)
 
-#             feat, out = net(vis_mixed, geo_mixed)
-#             loss_ce = tricks_criterion(criterion, out, y_a.squeeze(), y_b.squeeze(), lam)
-#             loss_re = tricks_criterion(regular, feat, y_a.squeeze(), y_b.squeeze(), lam)
+#             feat, out = net(vis_, geo_)
+#             loss_ce = tricks_criterion(criterion, out, y_vis.squeeze(), y_geo.squeeze(), hyper)
+#             loss_re = tricks_criterion(regular, feat, y_vis.squeeze(), y_geo.squeeze(), hyper)
 #             loss = loss_ce + 0.001 * loss_re
 
             loss.backward()
