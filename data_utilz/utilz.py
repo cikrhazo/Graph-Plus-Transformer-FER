@@ -113,3 +113,32 @@ def multi_frame(data):
         if j > 0:
             data_new[2, j, :, :] = data[j, :, :] - data[j-1, :, :]
     return data_new
+
+
+def random_erase(image, area_ratio_range=0.1, min_aspect_ratio=0.3, max_attempt=100):
+    # image = np.asarray(image).copy()
+    #
+    # if np.random.random() > p:
+    #     return image
+
+    sl, sh = area_ratio_range, area_ratio_range
+    rl, rh = min_aspect_ratio, 1. / min_aspect_ratio
+
+    h, w = image.shape[:2]
+    image_area = h * w
+
+    for _ in range(max_attempt):
+        mask_area = np.random.uniform(sl, sh) * image_area
+        aspect_ratio = np.random.uniform(rl, rh)
+        mask_h = int(np.sqrt(mask_area * aspect_ratio))
+        mask_w = int(np.sqrt(mask_area / aspect_ratio))
+
+        if mask_w < w and mask_h < h:
+            x0 = np.random.randint(0, w - mask_w)
+            y0 = np.random.randint(0, h - mask_h)
+            x1 = x0 + mask_w
+            y1 = y0 + mask_h
+            image[y0:y1, x0:x1] = np.zeros(shape=(mask_h, mask_w, 3))
+            break
+
+    return image
