@@ -115,7 +115,7 @@ def multi_frame(data):
     return data_new
 
 
-def random_erase(image, area_ratio_range=0.1, min_aspect_ratio=0.3, max_attempt=100):
+def random_erase(image, area_ratio_range=0.05, min_aspect_ratio=0.3, max_attempt=100):
     # image = np.asarray(image).copy()
     #
     # if np.random.random() > p:
