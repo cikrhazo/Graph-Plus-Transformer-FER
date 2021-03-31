@@ -88,9 +88,8 @@ class OuluSet(data.Dataset):
                 if self.flip and self.online_ldm:
                     img = np.fliplr(img)
                 if self.online_ldm:
-                    with torch.no_grad():
-                        lmarks = self.fa.get_landmarks(np.uint8(img * 255))  # a list of 68 point: [(x_0, y_0), (x_1, y_1), ...]
-                        lmarks = np.array(lmarks)[:, 17:, :]
+                    lmarks = self.fa.get_landmarks(np.uint8(img * 255))  # a list of 68 point: [(x_0, y_0), (x_1, y_1), ...]
+                    lmarks = np.array(lmarks)[:, 17:, :]
                     if lmarks is None:
                         logging.info('Landmark Error')
                         logging.error('Error: CANNOT Find Landmarks from Sequence: {}!'.format(path))
