@@ -94,9 +94,8 @@ class eNTERFace(data.Dataset):
                 img = cv2.imread(img_path, cv2.IMREAD_COLOR)[:, :, ::-1] / 255.
                 img = cv2.resize(img, dsize=(self.out_size, self.out_size), interpolation=cv2.INTER_LINEAR)
                 if self.online_ldm:
-                    with torch.no_grad():
-                        lmarks = self.fa.get_landmarks(img)  # a list of 68 point, i.e. [(x_0, y_0), (x_1, y_1), ...]
-                        lmarks = lmarks[:, 17:, :]
+                    lmarks = self.fa.get_landmarks(img)  # a list of 68 point, i.e. [(x_0, y_0), (x_1, y_1), ...]
+                    lmarks = lmarks[:, 17:, :]
                     if lmarks is None:
                         logging.info('Landmark Error')
                         logging.error('Error: CANNOT Find Landmarks from Sequence: {}!'.format(path))
